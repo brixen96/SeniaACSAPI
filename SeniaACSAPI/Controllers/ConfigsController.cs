@@ -82,6 +82,8 @@ namespace SeniaACSAPI.Controllers
                         }
                     }
 
+                    Console.WriteLine("Reader: " + reader.ToString());
+
                     return Ok(reader.ToString());
                 }
             }

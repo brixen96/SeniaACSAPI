@@ -24,6 +24,20 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 
 builder.Services.AddControllersWithViews();
 
+var MySeniaFrontends = "_mySeniaFrontends";
+
+var origins = builder.Configuration.GetSection("AllowedOrigins").Value.ToString().Split(";");
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(MySeniaFrontends, builder =>
+    {
+        builder.WithOrigins(origins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
@@ -82,18 +96,20 @@ else
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseCors(
-    options => options
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .SetIsOriginAllowed((host) => true)
-);
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+}
+else
+{
+    app.UseCors(MySeniaFrontends);
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

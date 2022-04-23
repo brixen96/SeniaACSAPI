@@ -29,22 +29,27 @@ namespace SeniaACSAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] UserDTOCreate userDto)
         {
-
-            var user = new IdentityUser
+            try
             {
-                Email = userDto.Email,
-                UserName = userDto.Email
-            };
+                var user = new IdentityUser
+                {
+                    Email = userDto.Email,
+                    UserName = userDto.Email
+                };
 
-            var result = await userManager.CreateAsync(user, userDto.Password);
+                var result = await userManager.CreateAsync(user, userDto.Password);
 
-            if(result.Succeeded)
-            {
-                await userManager.AddToRoleAsync(user, "Admin");
+                //await userManager.AddToRoleAsync(user, "ADMIN");
+
                 return Ok();
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+                throw;
+            }
+
             
-            return BadRequest();
         }
 
         [HttpPost("Login")]
